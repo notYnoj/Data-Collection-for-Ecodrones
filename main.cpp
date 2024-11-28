@@ -26,11 +26,17 @@ Of course to avoid overfitting/memorization all of the pieces of trash processed
 should be under the influence of some sort of change in enviornemnt (i.e wind, different lighting, rain, etc.)
 */
 
+//Importing OpenCV and bits/stdc++.h (because I'm lazy :D)
+#include <bits/stdc++.h>
+#include <opencv2/opencv.hpp>
+
 
 
 
 //main function
-
 int main(){
-
+    
 }
+
+//To run on macos, run: g++ -std=c++17 -o main main.cpp $(pkg-config --cflags --libs opencv4)
+//followed by: ./main
