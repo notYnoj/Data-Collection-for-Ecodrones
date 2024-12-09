@@ -27,21 +27,26 @@ should be under the influence of some sort of change in enviornemnt (i.e wind, d
 */
 //Importing OpenCV and bits/stdc++.h (because I'm lazy :D)
 //mac initally:
+#include <bits/stdc++.h>
 #include <opencv2/opencv.hpp>
 #include <glob.h>
 #include <unistd.h>
 
 int videos;
 
-std::wstring Path(){
-    char buffer[PATH_MAX];
-    if(getcwd(buffer, sizeof(buffer)) != nullptr){
+void Path(char* buffer, size_t size){
+    if(getcwd(buffer, size) != nullptr){
         std::cout<<"Testing Directory is: "<< buffer<<std::endl;
+    }else{
+        perror("getcwd bad");
     }
+    return;
 
 }
 void helper(){
-    Path();
+   char buffer[PATH_MAX];
+   Path(buffer, sizeof(buffer));
+   return;
 }
 //main function
 int main(){
