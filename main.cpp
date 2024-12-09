@@ -25,17 +25,35 @@ We will use OpenCV's ROI (region of interst) functionality
 Of course to avoid overfitting/memorization all of the pieces of trash processed through this method
 should be under the influence of some sort of change in enviornemnt (i.e wind, different lighting, rain, etc.)
 */
-
 //Importing OpenCV and bits/stdc++.h (because I'm lazy :D)
-#include <bits/stdc++.h>
+//mac initally:
 #include <opencv2/opencv.hpp>
+#include <glob.h>
+#include <unistd.h>
 
+int videos;
 
+std::wstring Path(){
+    char buffer[PATH_MAX];
+    if(getcwd(buffer, sizeof(buffer)) != nullptr){
+        std::cout<<"Testing Directory is: "<< buffer<<std::endl;
+    }
 
-
+}
+void helper(){
+    Path();
+}
 //main function
 int main(){
-    
+    //We start by taking input from the user
+    std::cout<<"Hey, EcoDrones Member! To simplify your expierence start by telling me how many videos we are processing!"<<std::endl;
+    std::cin>>videos;
+    for(int i = 0; i<videos; i++){
+        std::cout<<"That's great!, Now Paste your videos into the current directory"<<std::endl;
+        helper();
+    }
+
+      
 }
 
 //To run on macos, run: g++ -std=c++17 -o main main.cpp $(pkg-config --cflags --libs opencv4)
