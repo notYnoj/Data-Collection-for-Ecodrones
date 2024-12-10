@@ -33,29 +33,38 @@ should be under the influence of some sort of change in enviornemnt (i.e wind, d
 #include <unistd.h>
 
 int videos;
-
+//perror everywhere is fun :D
+//a function that returns the path of the current directory
 void Path(char* buffer, size_t size){
     if(getcwd(buffer, size) != nullptr){
         std::cout<<"Testing Directory is: "<< buffer<<std::endl;
     }else{
-        perror("getcwd bad");
+        perror("getcwd error: ");
     }
     return;
-
 }
-void helper(){
-   char buffer[PATH_MAX];
-   Path(buffer, sizeof(buffer));
-   return;
+//a function that creates a directory in the current directory
+void CreateDirectory(const std::string& dirName) {
+    // Use mkdir to create a directory in the current thing also apparently 0777 is read write execute permissions
+    if (mkdir(dirName.c_str(), 0777) == 0) {
+        std::cout << "Directory created successfully!" << std::endl;
+    } else {
+        perror("mkdir error: ");
+    }
+}
+//a helper function that process each video 
+void helper(int video){
+   
 }
 //main function
 int main(){
     //We start by taking input from the user
-    std::cout<<"Hey, EcoDrones Member! To simplify your expierence start by telling me how many videos we are processing!"<<std::endl;
-    std::cin>>videos;
+    std::cout<<"Hey, EcoDrones Member!"<<std::endl;
+    createDir("Upload Videos Here");
+    std::cout<<"I've made a directory in the current operating directory, go ahead and place all the videos you want to process, The DIR is called: Upload Videos here "<<std::endl;
     for(int i = 0; i<videos; i++){
         std::cout<<"That's great!, Now Paste your videos into the current directory"<<std::endl;
-        helper();
+        helper(i);
     }
 
       
