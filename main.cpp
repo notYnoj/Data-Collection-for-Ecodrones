@@ -29,46 +29,111 @@ should be under the influence of some sort of change in enviornemnt (i.e wind, d
 //mac initally:
 #include <bits/stdc++.h>
 #include <opencv2/opencv.hpp>
-#include <glob.h>
+#include <filesystem>
 #include <unistd.h>
 
-int videos;
-//perror everywhere is fun :D
-//a function that returns the path of the current directory
-void Path(char* buffer, size_t size){
-    if(getcwd(buffer, size) != nullptr){
-        std::cout<<"Testing Directory is: "<< buffer<<std::endl;
-    }else{
-        perror("getcwd error: ");
-    }
-    return;
-}
-//a function that creates a directory in the current directory
-void CreateDirectory(const std::string& dirName) {
-    // Use mkdir to create a directory in the current thing also apparently 0777 is read write execute permissions
-    if (mkdir(dirName.c_str(), 0777) == 0) {
-        std::cout << "Directory created successfully!" << std::endl;
+namespace fs = std::filesystem;
+
+std::vector<std::string> videos;
+
+// Function to get the current working directory
+std::string GetCurrentPath() {
+    char buffer[PATH_MAX];
+    if (getcwd(buffer, sizeof(buffer)) != nullptr) {
+        return std::string(buffer);
     } else {
-        perror("mkdir error: ");
+        perror("getcwd error: ");
+        return "";
     }
 }
-//a helper function that process each video 
-void helper(int video){
-   
+
+// Function to create a directory
+void CreateDirectory(const std::string& dirName) {
+    if (!fs::exists(dirName)) {
+        if (fs::create_directory(dirName)) {
+            std::cout << "Directory created successfully: " << dirName << std::endl;
+        } else {
+            std::cerr << "Failed to create directory: " << dirName << std::endl;
+        }
+    } else {
+        std::cout << "Directory already exists: " << dirName << std::endl;
+    }
 }
-//main function
-int main(){
-    //We start by taking input from the user
-    std::cout<<"Hey, EcoDrones Member!"<<std::endl;
-    createDir("Upload Videos Here");
-    std::cout<<"I've made a directory in the current operating directory, go ahead and place all the videos you want to process, The DIR is called: Upload Videos here "<<std::endl;
-    for(int i = 0; i<videos; i++){
-        std::cout<<"That's great!, Now Paste your videos into the current directory"<<std::endl;
-        helper(i);
+
+// Function to check if a file is a valid video
+bool ValidVideo(const std::string& path) {
+    cv::VideoCapture cap(path);
+    return cap.isOpened();
+}
+
+// Helper function to process each video
+void ProcessVideo(const std::string& videoPath, const std::string& outputDir, const int frameIndex, const int frameEnd) {
+    std::cout << "Processing video: " << videoPath << std::endl;
+
+    cv::VideoCapture cap(videoPath);
+    if (!cap.isOpened()) {
+        std::cerr << "Failed to open video: " << videoPath << std::endl;
+        return;
     }
 
-      
+    int fps = static_cast<int>(cap.get(cv::CAP_PROP_FPS));
+    int frameCount = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
+    std::cout << "Video FPS: " << fps << ", Total Frames: " << frameCount << std::endl;
+
+    cv::Mat frame;
+    while (cap.read(frame) && frameIndex<frameEnd) {
+        std::string frameFile = outputDir + "/frame_" + std::to_string(frameIndex) + ".png";
+        cv::imwrite(frameFile, frame);
+        frameIndex++;
+    }
+
+    std::cout << "Processing complete! Frames saved to: " << outputDir << std::endl;
 }
+
+// Main function
+int main() {
+    std::cout << "Hey, EccoDrones Member!" << std::endl;
+
+    // Get current path and create a directory for video uploads
+    std::string currentPath = GetCurrentPath();
+    if (currentPath.empty()) {
+        std::cerr << "Error: Failed to retrieve current directory." << std::endl;
+        return 1;
+    }
+
+    std::string uploadDir = currentPath + "/Upload Videos Here";
+    CreateDirectory(uploadDir);
+
+    std::cout << "Place all the videos you want to process in the directory: " << uploadDir << std::endl;
+
+    // Scan for videos in the upload directory
+    for (const auto& entry : fs::directory_iterator(uploadDir)) {
+        if (entry.is_regular_file() && ValidVideo(entry.path().string())) {
+            videos.push_back(entry.path().string());
+        }
+    }
+
+    if (videos.empty()) {
+        std::cout << "No valid videos found in the directory: " << uploadDir << std::endl;
+        return 0;
+    }
+
+    // Create output directory for frames
+    std::string outputDir = currentPath + "/Processed Frames";
+    CreateDirectory(outputDir);
+
+    // Process each video
+    for (const auto& video : videos) {
+        std::string videoOutputDir = outputDir + "/" + fs::path(video).stem().string();
+        CreateDirectory(videoOutputDir);
+        ProcessVideo(video, videoOutputDir);
+    }
+
+    std::cout << "All videos processed! Frames are in: " << outputDir << std::endl;
+
+    return 0;
+}
+
 
 //To run on macos, run: g++ -std=c++17 -o main main.cpp $(pkg-config --cflags --libs opencv4)
 //followed by: ./main
