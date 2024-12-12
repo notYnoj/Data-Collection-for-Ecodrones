@@ -126,7 +126,10 @@ int main() {
     for (const auto& video : videos) {
         std::string videoOutputDir = outputDir + "/" + fs::path(video).stem().string();
         CreateDirectory(videoOutputDir);
-        ProcessVideo(video, videoOutputDir);
+        int frameIndex, frameEnd;
+        std::cout<<"We're currently doing the video at: "<<fs::path(video).stem().string()<<" Please enter the frame Start and frame end";
+        std::cin>>frameIndex>>frameEnd;
+        ProcessVideo(video, videoOutputDir, min(frameIndex, frameEnd), max(frameIndex, frameEnd));
     }
 
     std::cout << "All videos processed! Frames are in: " << outputDir << std::endl;
