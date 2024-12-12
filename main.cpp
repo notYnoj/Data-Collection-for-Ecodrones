@@ -67,7 +67,7 @@ bool ValidVideo(const std::string& path) {
 }
 
 // Helper function to process each video
-void ProcessVideo(const std::string& videoPath, const std::string& outputDir, const int frameIndex, const int frameEnd) {
+void ProcessVideo(const std::string& videoPath, const std::string& outputDir, int frameIndex, int frameEnd) {
     std::cout << "Processing video: " << videoPath << std::endl;
 
     cv::VideoCapture cap(videoPath);
@@ -129,7 +129,7 @@ int main() {
         int frameIndex, frameEnd;
         std::cout<<"We're currently doing the video at: "<<fs::path(video).stem().string()<<" Please enter the frame Start and frame end";
         std::cin>>frameIndex>>frameEnd;
-        ProcessVideo(video, videoOutputDir, min(frameIndex, frameEnd), max(frameIndex, frameEnd));
+        ProcessVideo(video, videoOutputDir, std::min(frameIndex, frameEnd), std::max(frameIndex, frameEnd));
     }
 
     std::cout << "All videos processed! Frames are in: " << outputDir << std::endl;
